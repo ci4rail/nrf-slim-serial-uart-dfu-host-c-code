@@ -40,7 +40,7 @@
 
 #include <stdio.h>
 #include <stdarg.h>
-#include "logging.h"
+#include "../UartSecureDFU/logging.h"
 
 int m_level = LOGGER_INFO_LVL_0;
 

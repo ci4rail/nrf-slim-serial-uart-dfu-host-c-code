@@ -382,7 +382,7 @@ static int dfu_serial_create_obj(uart_drv_t *p_uart, uint8_t obj_type, uint32_t 
 static int dfu_serial_stream_data(uart_drv_t *p_uart, const uint8_t *p_data, uint32_t data_size)
 {
 	int err_code = 0;
-	uint32_t pos, stp, stp_max;
+	uint32_t pos, stp, stp_max=0;
 
 	if (p_data == NULL || !data_size)
 	{

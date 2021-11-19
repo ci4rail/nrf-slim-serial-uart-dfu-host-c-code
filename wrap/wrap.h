@@ -1,0 +1,16 @@
+#define dfu_serial_open eloc_dfu_serial_open
+#define dfu_serial_close eloc_dfu_serial_close
+#define dfu_serial_send_init_packet eloc_dfu_serial_send_init_packet
+#define dfu_serial_send_firmware eloc_dfu_serial_send_firmware
+
+#define dfu_send_image eloc_dfu_send_image
+
+#define encode_slip eloc_encode_slip
+#define decode_slip eloc_decode_slip
+
+#define uart_slip_open eloc_uart_slip_open
+#define uart_slip_close eloc_uart_slip_close
+#define uart_slip_send eloc_uart_slip_send
+#define uart_slip_receive eloc_uart_slip_receive
+
+#define crc32_compute eloc_crc32_compute
