@@ -13,4 +13,17 @@
 #define uart_slip_send eloc_uart_slip_send
 #define uart_slip_receive eloc_uart_slip_receive
 
+#define uart_drv_open eloc_uart_drv_open
+#define uart_drv_close eloc_uart_drv_close
+#define uart_drv_send eloc_uart_drv_send
+#define uart_drv_receive eloc_uart_drv_receive
+
 #define crc32_compute eloc_crc32_compute
+
+#define logger_error eloc_logger_error
+#define logger_info eloc_logger_info
+#define logger_info_1 eloc_logger_info_1
+#define logger_info_2 eloc_logger_info_2
+#define logger_info_3 eloc_logger_info_3
+#define logger_set_info_level eloc_logger_set_info_level
+#define logger_get_info_level eloc_logger_get_info_level
