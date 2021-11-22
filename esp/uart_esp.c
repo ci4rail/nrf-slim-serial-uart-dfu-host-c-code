@@ -10,7 +10,6 @@
 int uart_drv_open(uart_drv_t *p_uart)
 {
     easylocate_uart_config_t *c = &p_uart->conf;
-
     uart_config_t uart_config = {
         .baud_rate = c->baud,
         .data_bits = UART_DATA_8_BITS,
@@ -21,63 +20,51 @@ int uart_drv_open(uart_drv_t *p_uart)
     };
     int intr_alloc_flags = 0;
 
-    //??    ESP_ERROR_CHECK(uart_driver_install(c->uart_num, UART_BUF_SIZE, 0, 0, NULL, intr_alloc_flags));
-    ESP_ERROR_CHECK(uart_param_config(c->uart_num, &uart_config));
-    ESP_ERROR_CHECK(uart_set_pin(c->uart_num, c->tx, c->rx, -1, -1));
+    if (uart_driver_install(c->uart_num, UART_BUF_SIZE, 0, 0, NULL, intr_alloc_flags) != ESP_OK) {
+        return 1;
+    }
+    if (uart_param_config(c->uart_num, &uart_config) != ESP_OK) {
+        return 1;
+    }
+    if (uart_set_pin(c->uart_num, c->tx, c->rx, -1, -1) != ESP_OK) {
+        return 1;
+    }
 
-    return err_code;
+    return 0;
 }
 
 int uart_drv_close(uart_drv_t *p_uart)
 {
-    int err_code = 0;
-    int fd = p_uart->tty_fd;
-
-    if (fd >= 0) {
-        if (close(fd)) {
-            logger_error("Cannot close TTY port!");
-
-            err_code = 1;
-        }
-    } else
-        err_code = 1;
-
-    return err_code;
+    return 0;
 }
 
 int uart_drv_send(uart_drv_t *p_uart, const uint8_t *pData, uint32_t nSize)
 {
-    int err_code = 0;
-    int32_t length;
+    uart_port_t uart_num = p_uart->conf.uart_num;
+    int length;
 
-    length = write(p_uart->tty_fd, pData, nSize);
+    length = uart_write_bytes(uart_num, pData, nSize);
     if (length != nSize) {
         logger_error("Cannot write TTY port!");
 
-        err_code = 1;
-    } else {
-        if (tcdrain(p_uart->tty_fd)) {
-            logger_error("Cannot drain TTY TX buffer!");
-
-            err_code = 1;
-        }
+        return 1;
     }
+    uart_wait_tx_done(uart_num, 1000 / portTICK_RATE_MS);
 
-    return err_code;
+    return 0;
 }
 
 int uart_drv_receive(uart_drv_t *p_uart, uint8_t *pData, uint32_t nSize, uint32_t *pSize)
 {
-    int err_code = 0;
+    uart_port_t uart_num = p_uart->conf.uart_num;
     int32_t length;
 
-    length = read(p_uart->tty_fd, pData, nSize);
+    length = uart_read_bytes(uart_num, pData, nSize, p_uart->conf.rx_timeout_ms / portTICK_RATE_MS);
     if (length < 0) {
         logger_error("Cannot read TTY port!");
+        return 1;
+    }
+    *pSize = length;
 
-        err_code = 1;
-    } else
-        *pSize = length;
-
-    return err_code;
+    return 0;
 }
