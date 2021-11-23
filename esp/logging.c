@@ -45,20 +45,23 @@
 #include <stdio.h>
 #include "esp_log.h"
 
-int m_level = LOGGER_INFO_LVL_0;
-const char* TAG = "eloclog";
+static int m_level = LOGGER_INFO_LVL_0;
+static const char* TAG = "eloclog";
+static char log_buf[512];
 
 void logger_error(const char* format, ...)
 {
     va_list argptr;
     va_start(argptr, format);
-    esp_log_writev(ESP_LOG_ERROR, TAG, format, argptr);
+    vsprintf(log_buf, format, argptr);
+    ESP_LOGE(TAG, "%s", log_buf);
     va_end(argptr);
 }
 
 void logger_info(const char* format, va_list arg_list)
 {
-    esp_log_writev(ESP_LOG_ERROR, TAG, format, arg_list);
+    vsprintf(log_buf, format, arg_list);
+    ESP_LOGW(TAG, "%s", log_buf);
 }
 
 void logger_info_1(const char* format, ...)
