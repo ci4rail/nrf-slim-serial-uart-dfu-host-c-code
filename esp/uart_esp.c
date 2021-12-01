@@ -5,6 +5,8 @@
 #include "driver/gpio.h"
 #include "driver/uart.h"
 
+#ifndef CONFIG_EASYLOCATE_SIMULATION
+
 #define UART_BUF_SIZE 256
 
 int uart_drv_open(uart_drv_t *p_uart)
@@ -70,3 +72,4 @@ int uart_drv_receive(uart_drv_t *p_uart, uint8_t *pData, uint32_t nSize, uint32_
 
     return 0;
 }
+#endif  // CONFIG_EASYLOCATE_SIMULATION
