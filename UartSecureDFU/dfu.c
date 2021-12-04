@@ -39,8 +39,7 @@
  * Modifications by Ci4Rail GmbH 2021
  */
 
-#include "dfu.h"
-
+#include "nrf-dfu.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -48,7 +47,7 @@
 #include "dfu_serial.h"
 #include "logging.h"
 
-int dfu_send_image(dfu_img_param_t *p_dfu_img)
+int dfu_send_image(nrf_dfu_img_param_t *p_dfu_img)
 {
     int err_code;
 
