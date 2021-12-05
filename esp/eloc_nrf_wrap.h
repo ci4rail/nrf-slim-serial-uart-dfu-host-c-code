@@ -3,8 +3,6 @@
 #define dfu_serial_send_init_packet eloc_dfu_serial_send_init_packet
 #define dfu_serial_send_firmware eloc_dfu_serial_send_firmware
 
-#define dfu_send_image eloc_dfu_send_image
-
 #define encode_slip eloc_encode_slip
 #define decode_slip eloc_decode_slip
 
