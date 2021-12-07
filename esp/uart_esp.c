@@ -5,6 +5,8 @@
 #include "driver/gpio.h"
 #include "driver/uart.h"
 
+#ifndef CONFIG_EASYLOCATE_SIMULATION
+
 #define UART_BUF_SIZE 256
 
 int uart_drv_open(uart_drv_t *p_uart)
@@ -60,7 +62,7 @@ int uart_drv_receive(uart_drv_t *p_uart, uint8_t *pData, uint32_t nSize, uint32_
     int32_t length;
 
     length = uart_read_bytes(uart_num, pData, nSize, p_uart->conf.rx_timeout_ms / portTICK_RATE_MS);
-    logger_info_1("uart_drv_receive len=%d to=%d", length, p_uart->conf.rx_timeout_ms / portTICK_RATE_MS);
+    // logger_info_1("uart_drv_receive len=%d to=%d", length, p_uart->conf.rx_timeout_ms / portTICK_RATE_MS);
 
     if (length < 0) {
         logger_error("Cannot read TTY port!");
@@ -70,3 +72,4 @@ int uart_drv_receive(uart_drv_t *p_uart, uint8_t *pData, uint32_t nSize, uint32_
 
     return 0;
 }
+#endif  // CONFIG_EASYLOCATE_SIMULATION
