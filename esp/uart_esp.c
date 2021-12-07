@@ -62,7 +62,7 @@ int uart_drv_receive(uart_drv_t *p_uart, uint8_t *pData, uint32_t nSize, uint32_
     int32_t length;
 
     length = uart_read_bytes(uart_num, pData, nSize, p_uart->conf.rx_timeout_ms / portTICK_RATE_MS);
-    logger_info_1("uart_drv_receive len=%d to=%d", length, p_uart->conf.rx_timeout_ms / portTICK_RATE_MS);
+    // logger_info_1("uart_drv_receive len=%d to=%d", length, p_uart->conf.rx_timeout_ms / portTICK_RATE_MS);
 
     if (length < 0) {
         logger_error("Cannot read TTY port!");
