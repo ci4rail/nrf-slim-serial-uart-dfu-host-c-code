@@ -58,9 +58,9 @@ int eloc_dfu_send_image(eloc_dfu_img_param_t *p_dfu_img)
         err_code = dfu_serial_send_init_packet(p_dfu_img->p_uart, p_dfu_img->p_img_dat, p_dfu_img->n_dat_size);
     }
 
-    if (!err_code) {
-        err_code = dfu_serial_send_firmware(p_dfu_img->p_uart, p_dfu_img->p_img_bin, p_dfu_img->n_bin_size);
-    }
+    // if (!err_code) {
+    //     err_code = dfu_serial_send_firmware(p_dfu_img->p_uart, p_dfu_img->p_img_bin, p_dfu_img->n_bin_size);
+    // }
 
     if (!err_code) {
         err_code = dfu_serial_close(p_dfu_img->p_uart);

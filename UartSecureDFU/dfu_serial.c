@@ -42,6 +42,7 @@
 #include <string.h>
 #include "dfu_serial.h"
 #include "crc32.h"
+#include "esp_log.h"
 #include "logging.h"
 
 // SLIP data log buffer size
@@ -579,6 +580,7 @@ int dfu_serial_send_init_packet(uart_drv_t *p_uart, const uint8_t *p_data, uint3
     nrf_dfu_response_select_t rsp_recover;
 
     logger_info_1("Sending init packet...");
+    ESP_LOGI("dfu", "Sending init packet...");
 
     if (p_data == NULL || !data_size) {
         logger_error("Invalid init packet!");
