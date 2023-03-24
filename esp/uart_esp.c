@@ -51,7 +51,7 @@ int uart_drv_send(uart_drv_t *p_uart, const uint8_t *pData, uint32_t nSize)
 
         return 1;
     }
-    uart_wait_tx_done(uart_num, 1000 / portTICK_RATE_MS);
+    uart_wait_tx_done(uart_num, pdMS_TO_TICKS(1000));
 
     return 0;
 }
@@ -61,7 +61,7 @@ int uart_drv_receive(uart_drv_t *p_uart, uint8_t *pData, uint32_t nSize, uint32_
     uart_port_t uart_num = p_uart->conf.uart_num;
     int32_t length;
 
-    length = uart_read_bytes(uart_num, pData, nSize, p_uart->conf.rx_timeout_ms / portTICK_RATE_MS);
+    length = uart_read_bytes(uart_num, pData, nSize, pdMS_TO_TICKS(p_uart->conf.rx_timeout_ms));
     // logger_info_1("uart_drv_receive len=%d to=%d", length, p_uart->conf.rx_timeout_ms / portTICK_RATE_MS);
 
     if (length < 0) {
