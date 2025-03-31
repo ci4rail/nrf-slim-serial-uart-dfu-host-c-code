@@ -31,7 +31,8 @@ int uart_drv_open(uart_drv_t *p_uart)
     if (uart_set_pin(c->uart_num, c->tx, c->rx, -1, -1) != ESP_OK) {
         return 1;
     }
-
+    // disable pullup to avoid powering the chip when we power off chip supply
+    gpio_set_pull_mode(c->rx, GPIO_FLOATING);
     return 0;
 }
 
