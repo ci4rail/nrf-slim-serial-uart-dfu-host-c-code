@@ -45,7 +45,7 @@
 #include <stdio.h>
 #include "esp_log.h"
 
-static int m_level = LOGGER_INFO_LVL_0;
+static int m_level = LOGGER_INFO_LVL_2;
 static const char* TAG = "eloclog";
 static char log_buf[512];
 

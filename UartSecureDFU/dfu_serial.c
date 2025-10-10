@@ -117,8 +117,8 @@ static uint16_t get_uint16_le(const uint8_t *p_data)
 {
     uint16_t data;
 
-    data = ((uint16_t) * (p_data + 0) << 0);
-    data += ((uint16_t) * (p_data + 1) << 8);
+    data = ((uint16_t)*(p_data + 0) << 0);
+    data += ((uint16_t)*(p_data + 1) << 8);
 
     return data;
 }
@@ -133,10 +133,10 @@ static uint32_t get_uint32_le(const uint8_t *p_data)
 {
     uint32_t data;
 
-    data = ((uint32_t) * (p_data + 0) << 0);
-    data += ((uint32_t) * (p_data + 1) << 8);
-    data += ((uint32_t) * (p_data + 2) << 16);
-    data += ((uint32_t) * (p_data + 3) << 24);
+    data = ((uint32_t)*(p_data + 0) << 0);
+    data += ((uint32_t)*(p_data + 1) << 8);
+    data += ((uint32_t)*(p_data + 2) << 16);
+    data += ((uint32_t)*(p_data + 3) << 24);
 
     return data;
 }
@@ -316,8 +316,10 @@ static int dfu_serial_select_obj(uart_drv_t *p_uart, uint8_t obj_type, nrf_dfu_r
                 p_select_rsp->offset = get_uint32_le(receive_data + 7);
                 p_select_rsp->crc = get_uint32_le(receive_data + 11);
 
-                logger_info_2("Object selected:  max_size:%u offset:%u crc:0x%08X", p_select_rsp->max_size,
-                    p_select_rsp->offset, p_select_rsp->crc);
+                logger_info_2("Object selected:  max_size:%u offset:%u crc:0x%08X",
+                    p_select_rsp->max_size,
+                    p_select_rsp->offset,
+                    p_select_rsp->crc);
             } else {
                 logger_error("Invalid object response!");
 
@@ -419,8 +421,11 @@ static int dfu_serial_execute_obj(uart_drv_t *p_uart)
     return err_code;
 }
 
-static int dfu_serial_stream_data_crc(
-    uart_drv_t *p_uart, const uint8_t *p_data, uint32_t data_size, uint32_t pos, uint32_t *p_crc)
+static int dfu_serial_stream_data_crc(uart_drv_t *p_uart,
+    const uint8_t *p_data,
+    uint32_t data_size,
+    uint32_t pos,
+    uint32_t *p_crc)
 {
     int err_code;
     nrf_dfu_response_crc_t rsp_crc;
@@ -451,8 +456,11 @@ static int dfu_serial_stream_data_crc(
     return err_code;
 }
 
-static int dfu_serial_try_to_recover_ip(uart_drv_t *p_uart, const uint8_t *p_data, uint32_t data_size,
-    nrf_dfu_response_select_t *p_rsp_recover, const nrf_dfu_response_select_t *p_rsp_select)
+static int dfu_serial_try_to_recover_ip(uart_drv_t *p_uart,
+    const uint8_t *p_data,
+    uint32_t data_size,
+    nrf_dfu_response_select_t *p_rsp_recover,
+    const nrf_dfu_response_select_t *p_rsp_select)
 {
     int err_code = 0;
     uint32_t pos_start, len_remain;
@@ -493,8 +501,11 @@ static int dfu_serial_try_to_recover_ip(uart_drv_t *p_uart, const uint8_t *p_dat
     return err_code;
 }
 
-static int dfu_serial_try_to_recover_fw(uart_drv_t *p_uart, const uint8_t *p_data, uint32_t data_size,
-    nrf_dfu_response_select_t *p_rsp_recover, const nrf_dfu_response_select_t *p_rsp_select)
+static int dfu_serial_try_to_recover_fw(uart_drv_t *p_uart,
+    const uint8_t *p_data,
+    uint32_t data_size,
+    nrf_dfu_response_select_t *p_rsp_recover,
+    const nrf_dfu_response_select_t *p_rsp_select)
 {
     int err_code = 0;
     uint32_t max_size, stp_size;
@@ -644,6 +655,7 @@ int dfu_serial_send_firmware(uart_drv_t *p_uart, const uint8_t *p_data, uint32_t
     if (!err_code) {
         err_code = dfu_serial_try_to_recover_fw(p_uart, p_data, data_size, &rsp_recover, &rsp_select);
     }
+    uint32_t save_timeout = p_uart->conf.rx_timeout_ms;
 
     if (!err_code) {
         max_size = rsp_select.max_size;
@@ -662,10 +674,8 @@ int dfu_serial_send_firmware(uart_drv_t *p_uart, const uint8_t *p_data, uint32_t
                     logger_error("dfu_serial_stream_data_crc %d", err_code);
                 }
             }
-
+            logger_info_1("Firmware sent: %u / %u", pos + stp_size, data_size);
             if (!err_code) {
-                uint32_t save_timeout = p_uart->conf.rx_timeout_ms;
-
                 if (pos + stp_size == data_size) {
                     // apply long timeout on last segment.. signature verification takes time
                     p_uart->conf.rx_timeout_ms = 5000;
@@ -675,13 +685,13 @@ int dfu_serial_send_firmware(uart_drv_t *p_uart, const uint8_t *p_data, uint32_t
                 if (err_code) {
                     logger_error("dfu_serial_execute_obj %d", err_code);
                 }
-                p_uart->conf.rx_timeout_ms = save_timeout;
             }
 
             if (err_code)
                 break;
         }
     }
+    p_uart->conf.rx_timeout_ms = save_timeout;
 
     return err_code;
 }
