@@ -4,6 +4,7 @@
 #include "logging.h"
 #include "driver/gpio.h"
 #include "driver/uart.h"
+#include "esp_timer.h"
 
 #ifndef CONFIG_EASYLOCATE_SIMULATION
 
@@ -31,7 +32,8 @@ int uart_drv_open(uart_drv_t *p_uart)
     if (uart_set_pin(c->uart_num, c->tx, c->rx, -1, -1) != ESP_OK) {
         return 1;
     }
-
+    // disable pullup to avoid powering the chip when we power off chip supply
+    gpio_set_pull_mode(c->rx, GPIO_FLOATING);
     return 0;
 }
 
@@ -51,25 +53,74 @@ int uart_drv_send(uart_drv_t *p_uart, const uint8_t *pData, uint32_t nSize)
 
         return 1;
     }
-    uart_wait_tx_done(uart_num, 1000 / portTICK_RATE_MS);
+    uart_wait_tx_done(uart_num, pdMS_TO_TICKS(1000));
 
     return 0;
 }
+
+// int uart_drv_receive(uart_drv_t *p_uart, uint8_t *pData, uint32_t nSize, uint32_t *pSize)
+// {
+//     uart_port_t uart_num = p_uart->conf.uart_num;
+//     int32_t length;
+
+//     length = uart_read_bytes(uart_num, pData, nSize, pdMS_TO_TICKS(p_uart->conf.rx_timeout_ms));
+//     // logger_info_1("uart_drv_receive len=%d to=%d", length, p_uart->conf.rx_timeout_ms / portTICK_RATE_MS);
+
+//     if (length < 0) {
+//         logger_error("Cannot read TTY port!");
+//         return 1;
+//     }
+//     *pSize = length;
+
+//     return 0;
+// }
 
 int uart_drv_receive(uart_drv_t *p_uart, uint8_t *pData, uint32_t nSize, uint32_t *pSize)
 {
     uart_port_t uart_num = p_uart->conf.uart_num;
     int32_t length;
 
-    length = uart_read_bytes(uart_num, pData, nSize, p_uart->conf.rx_timeout_ms / portTICK_RATE_MS);
-    // logger_info_1("uart_drv_receive len=%d to=%d", length, p_uart->conf.rx_timeout_ms / portTICK_RATE_MS);
+    size_t avail;
+    if(uart_get_buffered_data_len(uart_num, &avail) != ESP_OK) {
+        logger_error("Cannot get TTY port buffered data length!");
+        return 1;
+    }
 
+    if (nSize == 0) {
+        *pSize = 0;
+        return 0;
+    }
+
+    if (avail == 0) {
+        // wait for first byte
+        length = uart_read_bytes(uart_num, pData, 1, pdMS_TO_TICKS(p_uart->conf.rx_timeout_ms));
+        if (length <= 0) {
+            goto ERROR;
+        }
+        *pSize = 1;
+        return 0;
+    }
+    // read whatever is available up to nSize 
+    if (avail > nSize) {
+        avail = nSize;
+    }
+
+    length = uart_read_bytes(uart_num, pData, avail, 0);
+    if (length <= 0) {
+        goto ERROR;
+    }
+    *pSize += length;
+
+    return 0;
+
+ERROR:
     if (length < 0) {
         logger_error("Cannot read TTY port!");
         return 1;
     }
-    *pSize = length;
 
+    *pSize = 0;
     return 0;
 }
+
 #endif  // CONFIG_EASYLOCATE_SIMULATION

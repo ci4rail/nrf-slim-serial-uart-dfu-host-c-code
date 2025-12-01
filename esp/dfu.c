@@ -68,3 +68,12 @@ int eloc_dfu_send_image(eloc_dfu_img_param_t *p_dfu_img)
 
     return err_code;
 }
+
+int eloc_dfu_ping(uart_drv_t *uart)
+{
+    int err_code;
+
+    err_code = dfu_serial_open(uart);
+
+    return err_code;
+}

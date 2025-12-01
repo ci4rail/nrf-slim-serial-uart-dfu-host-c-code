@@ -10,3 +10,4 @@ typedef struct {
 } eloc_dfu_img_param_t;
 
 int eloc_dfu_send_image(eloc_dfu_img_param_t *p_dfu_img);
+int eloc_dfu_ping(uart_drv_t *uart);
